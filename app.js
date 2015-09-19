@@ -31,7 +31,6 @@ var devCreate = function(data, callback){
                 }
 
                 if(!bool){
-                    var developer = require('./users/dev');
                     developer.name = user.name;
                     developer.gitHandle = user.login;
                     developer.picUrl = user.avatar_url;
@@ -96,6 +95,13 @@ var devLogin = function(data, callback){
     });
 };
 
+var devMatch = function(query, callback){
+    var usersRef = mainRef.child("developers");
+    usersRef.orderByChild("lookup").equalTo(query).once("value", function(snapshot) {
+        callback(null, snapshot.val());
+    });
+};
+
 var createProj = function(callback){};
 
 var express = require("express");
@@ -140,6 +146,21 @@ app.post('/developer/login', function(req, res){
         "Access-Control-Allow-Origin": "*"
     });
     devLogin(req.body, function(err, data){
+        if(err){
+            res.status(404).send({message:err});
+        }
+        else{
+            res.status(200).send(data);
+        }
+    });
+});
+
+app.post('/developer/match', function(req, res){
+    res.set({
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+    });
+    devMatch(req.body.query, function(err, data){
         if(err){
             res.status(404).send({message:err});
         }
