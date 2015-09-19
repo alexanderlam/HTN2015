@@ -31,7 +31,7 @@ Task
 developer endpoints:
 ```
 POST /developer/signup 
- body: {"user":githubHandle}
+ body: {"user":githubHandle,"lookup":interests}
 POST /developer/login
  body: {"user":githubHandle}
 POST /developer/match
