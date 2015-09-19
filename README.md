@@ -27,3 +27,13 @@ Task
 -points_rewarded
 -name
 -description
+
+developer endpoints:
+```
+POST /developer/signup 
+ body: {"user":githubHandle}
+POST /developer/login
+ body: {"user":githubHandle}
+POST /developer/match
+ body: {"query":lookupField}
+```
