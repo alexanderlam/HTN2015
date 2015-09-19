@@ -170,3 +170,22 @@ app.post('/developer/match', function(req, res){
     });
 });
 
+var username = 'alexanderlam';
+var reponame = 'HTN2015';
+app.get('/issues', function(req, res){
+    res.set({
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+    });
+
+    var issues = github.getIssues(username, reponame);
+    issues.list({}, function(err, issues) {
+        if(err){
+            res.status(404).send({message:err});
+        }
+        else{
+            res.status(200).send(issues);
+        }
+    });
+});
+
