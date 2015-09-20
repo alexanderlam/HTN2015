@@ -8,6 +8,7 @@ var github = new Github({
 });
 
 var developer = require('./users/dev');
+var project = require('./users/proj');
 
 var devCreate = function(data, callback){
     github.getUser().show(data.user, function(err, user){
@@ -36,21 +37,19 @@ var devCreate = function(data, callback){
                     developer.picUrl = user.avatar_url;
                     developer.gitUrl = user.url;
                     developer.description = user.bio;
-                    developer.lookup = null;
+                    developer.lookup = data.lookup ? data.lookup:null;
 
                     usersRef.push().set(developer);
                     callback(null, developer);
                 }
                 else{
-                    callback('already exists', null);
+                    callback('dev already exists', null);
                 }
 
             }, function (errorObject) {
                 console.log("The read failed: " + errorObject.code);
                 callback(errorObject, null);
             });
-
-
         }
     });
 };
@@ -82,15 +81,13 @@ var devLogin = function(data, callback){
                     callback(null, ourUser);
                 }
                 else{
-                    callback('user does not exist', null);
+                    callback('dev does not exist', null);
                 }
 
             }, function (errorObject) {
                 console.log("The read failed: " + errorObject.code);
                 callback(errorObject, null);
             });
-
-
         }
     });
 };
@@ -102,7 +99,95 @@ var devMatch = function(query, callback){
     });
 };
 
-var createProj = function(callback){};
+var projCreate = function(data, callback){
+    var repo = github.getRepo(data.user, data.repo);
+    repo.show(function(err, repo){
+        if(err){
+            console.log(err);
+        }
+        else{
+            var list = {};
+            var reposRef = mainRef.child("projects");
+
+            reposRef.once("value", function(snapshot) {
+                list = snapshot.val();
+
+                var bool = false;
+                for (var key in list) {
+                    if (list.hasOwnProperty(key)) {
+                        if(list[key].name === repo.full_name){
+                            bool = true;
+                        }
+                    }
+                }
+
+                if(!bool){
+                    project.name = repo.full_name;
+                    project.owner = repo.owner.login;
+                    project.gitUrl = repo.url;
+                    project.description = repo.description;
+                    project.lookup = data.lookup ? data.lookup:null;
+
+                    reposRef.push().set(project);
+                    callback(null, project);
+                }
+                else{
+                    callback('project already exists', null);
+                }
+
+            }, function (errorObject) {
+                console.log("The read failed: " + errorObject.code);
+                callback(errorObject, null);
+            });
+        }
+    });
+};
+
+var projLogin = function(data, callback){
+    var repo = github.getRepo(data.user, data.repo);
+    repo.show(function(err, repo){
+        if(err){
+            console.log(err);
+        }
+        else{
+            var ourProj = {};
+            var list = {};
+            var reposRef = mainRef.child("projects");
+
+            reposRef.once("value", function(snapshot) {
+                list = snapshot.val();
+
+                var bool = false;
+                for (var key in list) {
+                    if (list.hasOwnProperty(key)) {
+                        if(list[key].name === repo.full_name){
+                            ourProj = list[key];
+                            bool = true;
+                        }
+                    }
+                }
+
+                if(bool){
+                    callback(null, ourProj);
+                }
+                else{
+                    callback('project does not exist', null);
+                }
+
+            }, function (errorObject) {
+                console.log("The read failed: " + errorObject.code);
+                callback(errorObject, null);
+            });
+        }
+    });
+};
+
+var projMatch = function(query, callback){
+    var usersRef = mainRef.child("projects");
+    usersRef.orderByChild("lookup").equalTo(query).once("value", function(snapshot) {
+        callback(null, snapshot.val());
+    });
+};
 
 var express = require("express");
 var app = express();
@@ -161,6 +246,51 @@ app.post('/developer/match', function(req, res){
         "Access-Control-Allow-Origin": "*"
     });
     devMatch(req.body.query, function(err, data){
+        if(err){
+            res.status(404).send({message:err});
+        }
+        else{
+            res.status(200).send(data);
+        }
+    });
+});
+
+app.post('/project/signup', function(req, res){
+    res.set({
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+    });
+    projCreate(req.body, function(err, data){
+        if(err){
+            res.status(404).send({message:err});
+        }
+        else{
+            res.status(200).send(data);
+        }
+    });
+});
+
+app.post('/project/login', function(req, res){
+    res.set({
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+    });
+    projLogin(req.body, function(err, data){
+        if(err){
+            res.status(404).send({message:err});
+        }
+        else{
+            res.status(200).send(data);
+        }
+    });
+});
+
+app.post('/project/match', function(req, res){
+    res.set({
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+    });
+    projMatch(req.body.query, function(err, data){
         if(err){
             res.status(404).send({message:err});
         }
