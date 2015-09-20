@@ -37,3 +37,13 @@ POST /developer/login
 POST /developer/match
  body: {"query":lookupField}
 ```
+
+project endpoints:
+```
+POST /project/signup 
+ body: {"user":githubHandle that owns repository, "repo":repository, "lookup":interests}
+POST /project/login
+ body: {"user":githubHandle that owns repository, "repo":repository}
+POST /project/match
+ body: {"query":lookupField}
+```
