@@ -28,6 +28,12 @@ Task
 -name
 -description
 
+IP/hostnames:
+```
+Google Cloud: http://104.197.32.137/
+Heroku: http://codehuntr.herokuapp.com/
+```
+
 developer endpoints:
 ```
 POST /developer/signup 
