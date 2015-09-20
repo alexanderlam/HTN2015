@@ -3,5 +3,6 @@ module.exports = {
     'owner':null,
     'gitUrl':null,
     'description':null,
-    'lookup':null
+    'lookup':null,
+    'picUrl':null
 };

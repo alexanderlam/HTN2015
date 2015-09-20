@@ -1,6 +1,7 @@
 var Github = require('github-api');
 var Firebase = require('firebase');
 var mainRef = new Firebase("https://crackling-inferno-3664.firebaseio.com/");
+var request = require('request');
 
 var github = new Github({
     token:process.env.DOCKER_GITHUB_CODE,
@@ -128,6 +129,7 @@ var projCreate = function(data, callback){
                     project.gitUrl = repo.url;
                     project.description = repo.description;
                     project.lookup = data.lookup ? data.lookup:null;
+                    project.picUrl = repo.owner.avatar_url;
 
                     reposRef.push().set(project);
                     callback(null, project);
@@ -323,3 +325,53 @@ app.get('/issues', function(req, res){
 app.get('/_ah/health', function(req, res) {
   res.status(200).send('ok');
   });
+
+//var requestAzure = {
+//    "Inputs": {
+//        "input1": {
+//            "ColumnNames": [
+//                "public_repos",
+//                "followers",
+//                "stars"
+//            ],
+//            "Values": [
+//                [
+//                    "0",
+//                    "0",
+//                    "0" ],
+//                [
+//                    "0",
+//                    "0",
+//                    "0" ]
+//            ] }
+//    },
+//    "GlobalParameters": {}
+//};
+//
+//app.post('/azure/user', function(req, res){
+//    res.set({
+//        "Content-Type": "application/json",
+//        "Access-Control-Allow-Origin": "*"
+//    });
+//
+//    var options = {
+//        method:'POST',
+//        url:'https://ussouthcentral.services.azureml.net/workspaces/febfd10c13d POST d4a9db4716fe08b2f72a6/services/6814f2d8218c453aa5232e8516043596/execute?api‐version=2.0&details=true',
+//        headers:{
+//            "Content‐Type":"application/json",
+//            "Content‐Length":400,
+//            "Authorization":"Bearer mr52m/5/Owybpag413K6qB5nU3/Bb/Mo2Xgwf3WOmuEXiPEl3I5InXm6Pa7ezpnlVJQAlPX8eICnI2R4Mtnh7g==",
+//            "Accept":"application/json"
+//        },
+//        body:JSON.stringify(requestAzure)
+//    }
+//
+//    request(options, function(err, data){
+//        if(err){
+//            console.log(err);
+//        }
+//        else{
+//            console.log(data.body);
+//        }
+//    })
+//});
