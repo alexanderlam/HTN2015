@@ -15,6 +15,7 @@ var devCreate = function(data, callback){
         if(err){
             console.log(err);
         }
+        
         else{
             var list = {};
             var usersRef = mainRef.child("developers");
@@ -319,3 +320,6 @@ app.get('/issues', function(req, res){
     });
 });
 
+app.get('/_ah/health', function(req, res) {
+  res.status(200).send('ok');
+  });
