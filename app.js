@@ -12,7 +12,7 @@ var developer = require('./users/dev');
 var project = require('./users/proj');
 
 var devCreate = function(data, callback){
-    github.getUser().show(data.user, function(err, user){
+    github.getUser().show(data, function(err, user){
         if(err){
             console.log(err);
         }
@@ -101,8 +101,8 @@ var devMatch = function(query, callback){
     });
 };
 
-var projCreate = function(data, callback){
-    var repo = github.getRepo(data.user, data.repo);
+var projCreate = function(user1, repo1, callback){
+    var repo = github.getRepo(user1, repo1);
     repo.show(function(err, repo){
         if(err){
             console.log(err);
@@ -128,7 +128,7 @@ var projCreate = function(data, callback){
                     project.owner = repo.owner.login;
                     project.gitUrl = repo.url;
                     project.description = repo.description;
-                    project.lookup = data.lookup ? data.lookup:null;
+                    project.lookup = user1.lookup ? user1.lookup:null;
                     project.picUrl = repo.owner.avatar_url;
 
                     reposRef.push().set(project);
@@ -326,6 +326,212 @@ app.get('/_ah/health', function(req, res) {
   res.status(200).send('ok');
   });
 
+var usernames = ["sindresorhus",
+        "jashkenas",
+        "substack",
+        "tj",
+        "kennethreitz",
+        "mbostock",
+        "vhf",
+        "hakimel",
+        "tpope",
+        "JakeWharton",
+        "addyosmani",
+        "defunkt",
+        "mitsuhiko",
+        "blueimp",
+        "nicklockwood",
+        "bartaz",
+        "necolas",
+        "mrdoob",
+        "sstephenson",
+        "robbyrussell",
+        "daneden",
+        "rstacruz",
+        "mattt",
+        "bevacqua",
+        "torvalds",
+        "bbatsov",
+        "ryanb",
+        "madrobby",
+        "progrium",
+        "jakubroztocil",
+        "antirez",
+        "mitchellh",
+        "creationix",
+        "caolan",
+        "mathiasbynens",
+        "scottjehl",
+        "desandro",
+        "maxogden",
+        "nvie",
+        "tiimgreen",
+        "maccman",
+        "felixge",
+        "typicode",
+        "ariya",
+        "dypsilon",
+        "davatron5000",
+        "sahat",
+        "remy",
+        "wycats",
+        "igrigorik",
+        "rwaldron",
+        "nnnick",
+        "chrisbanes",
+        "vinta",
+        "getify",
+        "Prinzhorn",
+        "vim-scripts",
+        "kripken",
+        "dimsemenov",
+        "mojombo",
+        "nthanmarz",
+        "IanLunn",
+        "peachananr",
+        "jakiestfu",
+        "sferik",
+        "astaxie",
+        "mdo",
+        "chriskempson",
+        "jrburke",
+        "soffes",
+        "crooloose",
+        "prakhar1989",
+        "rs",
+        "octocat",
+        "chjj",
+        "kenwheeler",
+        "LeaVerou",
+        "csswizardry",
+        "jaredhanson",
+        "paulirish",
+        "mperham",
+        "daimajia",
+        "ankane",
+        "romaonthego",
+        "bayandin",
+        "douglascrockford",
+        "altercation",
+        "steipete",
+        "mattn",
+        "cantino",
+        "alex",
+        "ccampbell",
+        "imathis",
+        "alvarotrigo",
+        "technomancy",
+        "mrmrs",
+        "aFarkas",
+        "justjavac"]
+    ;
+
+var repos = [
+    'twbs',
+    'vhf',
+    'angular',
+    'mbostock',
+    'jquery',
+    'FortAwesome',
+    'rails',
+    'meteor',
+    'github',
+    'robbyrussell',
+    'Homebrew',
+    'adobe',
+    'jashkenas',
+    'nwjs',
+    'moment',
+    'torvalds',
+    'daneden',
+    'zurb',
+    'hakimel',
+    'docker',
+    'blueimp',
+    'jekyll',
+    'mrdoob',
+    'strongloop',
+    'sindresorhus',
+    'harvesthq',
+    'facebook',
+    'jkbrzt',
+    'AFNetworking',
+    'necolas',
+    'Automattic',
+    'resume',
+    'tiimgreen',
+    'Semantic-Org',
+    'gitlabhq',
+    'laravel',
+    'Modernizr',
+    'kennethreitz',
+    'TryGhost',
+    'google',
+    'driftyco',
+    'jashkenas',
+    'discourse',
+    'nnnick'
+];
+
+var users = [
+    'bootstrap',
+    'free-programming-books',
+    'angular.js',
+    'd3',
+    'jquery',
+    'Font-Awesome',
+    'rails',
+    'meteor',
+    'gitignore',
+    'oh-my-zsh',
+    'homebrew',
+    'brackets',
+    'backbone',
+    'nw.js',
+    'moment',
+    'linux',
+    'animate.css',
+    'foundation',
+    'reveal.js',
+    'docker',
+    'jQuery-File-Upload',
+    'jekyll',
+    'three.js',
+    'express',
+    'awesome',
+    'chosen',
+    'react',
+    'httpie',
+    'AFNetworking',
+    'normalize.css',
+    'socket.io',
+    'resume.github.com',
+    'github-cheat-sheet',
+    'Semantic-UI',
+    'gitlabhq',
+    'laravel',
+    'Modernizr',
+    'requests',
+    'Ghost',
+    'material-design-icons',
+    'ionic',
+    'underscore',
+    'discourse',
+    'Chart.js'
+]
+
+var recurse = function(count){
+    if(count > 45){
+        return;
+    }
+    else {
+        projCreate(repos[count], users[count], function(err, user){
+            console.log(user);
+            recurse(count+1);
+        });
+    }
+};
+recurse(0);
 //var requestAzure = {
 //    "Inputs": {
 //        "input1": {
@@ -356,12 +562,10 @@ app.get('/_ah/health', function(req, res) {
 //
 //    var options = {
 //        method:'POST',
-//        url:'https://ussouthcentral.services.azureml.net/workspaces/febfd10c13d POST d4a9db4716fe08b2f72a6/services/6814f2d8218c453aa5232e8516043596/execute?api‐version=2.0&details=true',
+//        url:'https://ussouthcentral.services.azureml.net/workspaces/febfd10c13dd4a9db4716fe08b2f72a6/services/6814f2d8218c453aa5232e8516043596/execute?api‐version=2.0&details=true',
 //        headers:{
 //            "Content‐Type":"application/json",
-//            "Content‐Length":400,
-//            "Authorization":"Bearer mr52m/5/Owybpag413K6qB5nU3/Bb/Mo2Xgwf3WOmuEXiPEl3I5InXm6Pa7ezpnlVJQAlPX8eICnI2R4Mtnh7g==",
-//            "Accept":"application/json"
+//            "Authorization":"Bearer mr52m/5/Owybpag413K6qB5nU3/Bb/Mo2Xgwf3WOmuEXiPEl3I5InXm6Pa7ezpnlVJQAlPX8eICnI2R4Mtnh7g=="
 //        },
 //        body:JSON.stringify(requestAzure)
 //    }
